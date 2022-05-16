@@ -1,9 +1,9 @@
-FROM golang:1.17 as builder
+FROM caddy:2.5.1-builder as builder
 
-RUN go install github.com/caddyserver/xcaddy/cmd/xcaddy@v0.2.1
-RUN xcaddy build v2.4.6 \
-  --with github.com/caddy-dns/digitalocean
+RUN xcaddy build \
+  --with github.com/caddy-dns/digitalocean@ac6e4fd9e1352c1c179a4258a48cd03d09f095ec \
+  --output /builder/caddy
 
 FROM busybox:1.34 as caddy
 
-COPY --from=builder /go/caddy /usr/local/bin/caddy
+COPY --from=builder /builder/caddy /usr/bin/caddy
