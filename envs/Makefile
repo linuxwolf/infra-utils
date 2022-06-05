@@ -23,4 +23,4 @@ test: .coverage/profile .coverage/index.html
 
 .PHONY: clean
 clean:
-	git clean -x .
+	git clean -xfd .
