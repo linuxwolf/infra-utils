@@ -33,7 +33,7 @@ func NewParser(l *log.Logger) *Parser {
 
 func (p *Parser) ProcessReader(r io.Reader) *Env {
 	scanner := bufio.NewScanner(r)
-	vars := map[string]string{}
+	env := NewEnvWith(nil)
 	for scanner.Scan() {
 		line := scanner.Text()
 		line = strings.TrimSpace(line)
@@ -41,14 +41,14 @@ func (p *Parser) ProcessReader(r io.Reader) *Env {
 		if err != nil {
 			p.log.Printf("skipping: %s", err)
 		} else {
-			vars[k] = v
+			env.vars[k] = v
 		}
 	}
 	if err := scanner.Err(); err != nil {
 		p.log.Printf("error while parsing reader: %v", err)
 	}
 
-	return NewEnvWith(vars)
+	return env
 }
 
 func (p *Parser) parseLine(line string) (string, string, error) {
