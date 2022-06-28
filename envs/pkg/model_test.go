@@ -33,6 +33,7 @@ func (suite *ModelTestSuite) TestNewEnvWith() {
 		"FOO": "foo value",
 		"BAR": "bar value",
 	})
+	assert.Equal(T, actual.String(), "BAR=bar value\nFOO=foo value")
 }
 
 func (suite *ModelTestSuite) TestIncluding() {
@@ -54,18 +55,34 @@ func (suite *ModelTestSuite) TestIncluding() {
 		"BAR": "env1 bar",
 		"BAZ": "env2 baz",
 	})
+	assert.Equal(
+		T,
+		result.String(),
+		"BAR=env1 bar\nBAZ=env2 baz\nFOO=env1 foo",
+	)
+
 	result = env2.Including(env1)
 	assert.Equal(T, result.vars, map[string]string{
 		"FOO": "env2 foo",
 		"BAR": "env1 bar",
 		"BAZ": "env2 baz",
 	})
+	assert.Equal(
+		T,
+		result.String(),
+		"BAR=env1 bar\nBAZ=env2 baz\nFOO=env2 foo",
+	)
 
 	result = env1.Including(NewEnvWith(nil))
 	assert.Equal(T, result.vars, map[string]string{
 		"FOO": "env1 foo",
 		"BAR": "env1 bar",
 	})
+	assert.Equal(
+		T,
+		result.String(),
+		"BAR=env1 bar\nFOO=env1 foo",
+	)
 }
 
 func (suite *ModelTestSuite) TestExcluding() {

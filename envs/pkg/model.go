@@ -1,5 +1,11 @@
 package pkg
 
+import (
+	"fmt"
+	"sort"
+	"strings"
+)
+
 type Env struct {
 	vars map[string]string
 }
@@ -37,4 +43,27 @@ func (e *Env) Excluding(other *Env) *Env {
 	}
 
 	return result
+}
+
+func (e *Env) String() string {
+	var idx int
+
+	keys := make([]string, len(e.vars))
+	idx = 0
+	for k, _ := range e.vars {
+		keys[idx] = k
+		idx++
+	}
+	sort.Strings(keys)
+
+	output := make([]string, len(e.vars))
+	idx = 0
+	for _, k := range keys {
+		v := e.vars[k]
+		// TODO: escape newlines
+		output[idx] = fmt.Sprintf("%s=%s", k, v)
+		idx++
+	}
+
+	return strings.Join(output, "\n")
 }
