@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"os"
 	"strings"
 	"testing"
 
@@ -14,12 +15,27 @@ func TestParser(t *testing.T) {
 
 type ParserTestSuite struct {
 	suite.Suite
-	parser *Parser
+	parser  *Parser
+	environ []string
 }
 
 func (suite *ParserTestSuite) SetupTest() {
 	suite.parser = NewParser(nil)
+	suite.environ = os.Environ()
+
+	os.Clearenv()
+	os.Setenv("ENV_FOO", "environ foo")
+	os.Setenv("ENV_BAR", "environ bar")
+	os.Setenv("ENV_BAZ", "environ baz")
 }
+func (suite *ParserTestSuite) TearDownTest() {
+	os.Clearenv()
+	for _, e := range suite.environ {
+		parts := strings.SplitN(e, "=", 2)
+		os.Setenv(parts[0], parts[1])
+	}
+}
+
 func (suite *ParserTestSuite) TestParseLine_Simple() {
 	T := suite.T()
 	p := suite.parser
@@ -60,6 +76,8 @@ func (suite *ParserTestSuite) TestProcessReader() {
 # main env file
 FOO=foo value
 BAR=bar value
+
+# bogus tests
 not value=bogus
 BOGUS=not not valid
 `
@@ -76,8 +94,11 @@ BOGUS=not not valid
 func (suite *ParserTestSuite) TestProcessArray() {
 	T := suite.T()
 	source := []string{
+		"# main env file",
 		"FOO=foo value",
 		"BAR=bar value",
+		"",
+		"# bogus tests",
 		"not value=bogus",
 		"BOGUS=not not valid",
 	}
@@ -89,4 +110,19 @@ func (suite *ParserTestSuite) TestProcessArray() {
 		"BAR":   "bar value",
 		"BOGUS": "not not valid",
 	}))
+}
+
+func (suite *ParserTestSuite) TestNewEnvsFromEnviron() {
+	T := suite.T()
+	envs := NewEnvsFromEnviron()
+	assert.Equal(T, envs, NewEnvWith(map[string]string{
+		"ENV_FOO": "environ foo",
+		"ENV_BAR": "environ bar",
+		"ENV_BAZ": "environ baz",
+	}))
+	assert.Equal(
+		T,
+		envs.String(),
+		"ENV_BAR=environ bar\nENV_BAZ=environ baz\nENV_FOO=environ foo",
+	)
 }
