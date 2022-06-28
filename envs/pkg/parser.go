@@ -4,10 +4,11 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"regexp"
 	"strings"
+
+	"go.uber.org/zap"
 )
 
 var (
@@ -18,12 +19,12 @@ var (
 
 type Parser struct {
 	ptn *regexp.Regexp
-	log *log.Logger
+	log *zap.SugaredLogger
 }
 
-func NewParser(l *log.Logger) *Parser {
+func NewParser(l *zap.SugaredLogger) *Parser {
 	if l == nil {
-		l = log.Default()
+		l = SetupLogging(0)
 	}
 
 	return &Parser{
@@ -40,13 +41,13 @@ func (p *Parser) ProcessReader(r io.Reader) *Env {
 		line = strings.TrimSpace(line)
 		k, v, err := p.parseLine(line)
 		if err != nil {
-			p.log.Printf("skipping: %s", err)
+			p.log.Warnf("skipping: %s", err)
 		} else {
 			env.vars[k] = v
 		}
 	}
 	if err := scanner.Err(); err != nil {
-		p.log.Printf("error while parsing reader: %v", err)
+		p.log.Warnf("error while parsing reader: %v", err)
 	}
 
 	return env
@@ -58,7 +59,7 @@ func (p *Parser) ProcessArray(ins []string) *Env {
 		line = strings.TrimSpace(line)
 		k, v, err := p.parseLine(line)
 		if err != nil {
-			p.log.Printf("skipping: %s", err)
+			p.log.Warnf("skipping: %s", err)
 		} else {
 			env.vars[k] = v
 		}
