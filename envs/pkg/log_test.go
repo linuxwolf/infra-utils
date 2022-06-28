@@ -16,6 +16,6 @@ type LogTestSuite struct{ suite.Suite }
 func (suite *LogTestSuite) TestSetupLogging() {
 	T := suite.T()
 
-	result := SetupLogging()
+	result := SetupLogging(0)
 	assert.NotNil(T, result)
 }
