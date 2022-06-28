@@ -72,3 +72,21 @@ BOGUS=not not valid
 		"BOGUS": "not not valid",
 	}))
 }
+
+func (suite *ParserTestSuite) TestProcessArray() {
+	T := suite.T()
+	source := []string{
+		"FOO=foo value",
+		"BAR=bar value",
+		"not value=bogus",
+		"BOGUS=not not valid",
+	}
+
+	p := suite.parser
+	result := p.ProcessArray(source)
+	assert.Equal(T, result, NewEnvWith(map[string]string{
+		"FOO":   "foo value",
+		"BAR":   "bar value",
+		"BOGUS": "not not valid",
+	}))
+}

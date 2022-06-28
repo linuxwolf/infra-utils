@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"regexp"
 	"strings"
 )
@@ -51,6 +52,21 @@ func (p *Parser) ProcessReader(r io.Reader) *Env {
 	return env
 }
 
+func (p *Parser) ProcessArray(ins []string) *Env {
+	env := NewEnvWith(nil)
+	for _, line := range ins {
+		line = strings.TrimSpace(line)
+		k, v, err := p.parseLine(line)
+		if err != nil {
+			p.log.Printf("skipping: %s", err)
+		} else {
+			env.vars[k] = v
+		}
+	}
+
+	return env
+}
+
 func (p *Parser) parseLine(line string) (string, string, error) {
 	line = strings.TrimSpace(line)
 
@@ -68,4 +84,11 @@ func (p *Parser) parseLine(line string) (string, string, error) {
 	}
 
 	return parts[1], parts[2], nil
+}
+
+func NewEnvsFromEnviron() *Env {
+	parser := NewParser(nil)
+	env := parser.ProcessArray(os.Environ())
+
+	return env
 }
