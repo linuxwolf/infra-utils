@@ -48,6 +48,7 @@ func (e *Env) Excluding(other *Env) *Env {
 func (e *Env) String() string {
 	var idx int
 
+	// sort keys
 	keys := make([]string, len(e.vars))
 	idx = 0
 	for k, _ := range e.vars {
@@ -60,7 +61,6 @@ func (e *Env) String() string {
 	idx = 0
 	for _, k := range keys {
 		v := e.vars[k]
-		// TODO: escape newlines
 		output[idx] = fmt.Sprintf("%s=%s", k, v)
 		idx++
 	}
