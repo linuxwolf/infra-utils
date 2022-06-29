@@ -44,9 +44,13 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		processor := NewProcessor()
 
+		// include all files
 		for _, fname := range args {
 			processor.processFile(fname)
 		}
+		// exclude existing environment
+		existing := pkg.NewEnvsFromEnviron()
+		processor.envs = processor.envs.Excluding(existing)
 
 		fmt.Fprintln(os.Stdout, processor.envs)
 	},
@@ -74,7 +78,7 @@ type Processor struct {
 func NewProcessor() *Processor {
 	logger := pkg.SetupLogging(verbosity)
 	proc := Processor{
-		envs:   pkg.NewEnvsFromEnviron(),
+		envs:   pkg.NewEnvWith(nil),
 		log:    logger,
 		parser: pkg.NewParser(logger),
 	}
