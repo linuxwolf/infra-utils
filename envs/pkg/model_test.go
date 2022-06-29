@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -33,7 +34,9 @@ func (suite *ModelTestSuite) TestNewEnvWith() {
 		"FOO": "foo value",
 		"BAR": "bar value",
 	})
-	assert.Equal(T, actual.String(), "BAR=bar value\nFOO=foo value")
+	assert.Equal(T, actual.String(), strings.TrimSpace(`
+BAR="bar value"
+FOO="foo value"`))
 }
 
 func (suite *ModelTestSuite) TestIncluding() {
@@ -58,7 +61,10 @@ func (suite *ModelTestSuite) TestIncluding() {
 	assert.Equal(
 		T,
 		result.String(),
-		"BAR=env1 bar\nBAZ=env2 baz\nFOO=env1 foo",
+		strings.TrimSpace(`
+BAR="env1 bar"
+BAZ="env2 baz"
+FOO="env1 foo"`),
 	)
 
 	result = env2.Including(env1)
@@ -70,7 +76,10 @@ func (suite *ModelTestSuite) TestIncluding() {
 	assert.Equal(
 		T,
 		result.String(),
-		"BAR=env1 bar\nBAZ=env2 baz\nFOO=env2 foo",
+		strings.TrimSpace(`
+BAR="env1 bar"
+BAZ="env2 baz"
+FOO="env2 foo"`),
 	)
 
 	result = env1.Including(NewEnvWith(nil))
@@ -81,7 +90,9 @@ func (suite *ModelTestSuite) TestIncluding() {
 	assert.Equal(
 		T,
 		result.String(),
-		"BAR=env1 bar\nFOO=env1 foo",
+		strings.TrimSpace(`
+BAR="env1 bar"
+FOO="env1 foo"`),
 	)
 }
 

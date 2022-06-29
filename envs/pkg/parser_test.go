@@ -123,6 +123,9 @@ func (suite *ParserTestSuite) TestNewEnvsFromEnviron() {
 	assert.Equal(
 		T,
 		envs.String(),
-		"ENV_BAR=environ bar\nENV_BAZ=environ baz\nENV_FOO=environ foo",
+		strings.TrimSpace(`
+ENV_BAR="environ bar"
+ENV_BAZ="environ baz"
+ENV_FOO="environ foo"`),
 	)
 }

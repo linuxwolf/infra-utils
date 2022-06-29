@@ -61,7 +61,8 @@ func (e *Env) String() string {
 	idx = 0
 	for _, k := range keys {
 		v := e.vars[k]
-		output[idx] = fmt.Sprintf("%s=%s", k, v)
+		v = strings.ReplaceAll(v, "\"", "\\\"")
+		output[idx] = fmt.Sprintf("%s=\"%s\"", k, v)
 		idx++
 	}
 
