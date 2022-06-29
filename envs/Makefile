@@ -1,4 +1,6 @@
-SOURCES := $(shell find . -type f -name "*.go") go.mod go.sum
+MODS=go.mod go.sum
+SOURCES := $(shell find . -type f -name "*.go" -and -not -name "*_test.go")
+TESTS := $(shell find . -type f -name "*_test.go")
 BINARY := envs
 
 .PHONY: help
@@ -7,13 +9,13 @@ help:
 	@echo "test     ---------- : Run tests (with coverage)"
 	@echo "clean    ---------- : Clean intermediate files"
 
-$(BINARY): $(SOURCES)
+$(BINARY): $(SOURCES) $(MODS)
 	go build -o $@
 
 .coverage:
 	mkdir -p $@
 
-.coverage/profile: .coverage $(SOURCES)
+.coverage/profile: .coverage $(SOURCES) $(TESTS) $(MODS)
 	go test \
 		-coverprofile=$@ \
 		./...
